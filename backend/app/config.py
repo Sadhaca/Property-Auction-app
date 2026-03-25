@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
 
     # Database
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/auction_db"
+    DATABASE_URL: str = "postgresql+asyncpg://auctionprop:auctionprop@localhost:5432/auctionprop"
 
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"

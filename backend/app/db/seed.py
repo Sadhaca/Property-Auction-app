@@ -554,9 +554,6 @@ SAMPLE_PROPERTIES = [
 
 async def seed_database():
     """Create initial data in the database."""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-
     async with async_session_factory() as db:
         # Seed subscription plans
         for plan_data in SUBSCRIPTION_PLANS:

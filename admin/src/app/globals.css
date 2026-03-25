@@ -4,92 +4,50 @@
 
 @layer base {
   :root {
-    --brand-primary: #1e3a5f;
-    --brand-accent: #10b981;
-  }
-
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  html {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  body {
-    @apply bg-slate-50 text-slate-900;
-  }
-
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    @apply bg-transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    @apply rounded-full bg-slate-300;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-slate-400;
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
   }
 }
 
-@layer components {
-  .page-container {
-    @apply mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8;
+@layer base {
+  * {
+    border-color: hsl(var(--border));
   }
-
-  .page-header {
-    @apply mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between;
-  }
-
-  .page-title {
-    @apply text-2xl font-bold text-slate-900;
-  }
-
-  .page-subtitle {
-    @apply text-sm text-slate-500;
-  }
-
-  .filter-bar {
-    @apply flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-card;
-  }
-
-  .stat-card {
-    @apply rounded-xl border border-slate-200 bg-white p-6 shadow-card transition-shadow hover:shadow-card-hover;
-  }
-
-  .stat-card-value {
-    @apply text-3xl font-bold text-slate-900;
-  }
-
-  .stat-card-label {
-    @apply text-sm font-medium text-slate-500;
-  }
-
-  .stat-card-change {
-    @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium;
-  }
-
-  .stat-card-change.positive {
-    @apply bg-emerald-50 text-emerald-700;
-  }
-
-  .stat-card-change.negative {
-    @apply bg-red-50 text-red-700;
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
   }
 }

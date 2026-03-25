@@ -57,6 +57,7 @@ services:
       DATABASE_URL: postgresql+asyncpg://auctionprop:auctionprop@postgres:5432/auctionprop
       REDIS_URL: redis://redis:6379/0
       ELASTICSEARCH_URL: http://elasticsearch:9200
+      DEBUG: "true"
     depends_on:
       postgres:
         condition: service_healthy
@@ -66,7 +67,7 @@ services:
         condition: service_healthy
     volumes:
       - ./backend:/app
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    command: bash start.sh
 
   worker:
     build:

@@ -12,9 +12,9 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
+    "@hookform/resolvers": "^3.3.4",
     "@react-navigation/bottom-tabs": "^6.5.11",
     "@react-navigation/native": "^6.1.9",
-    "@hookform/resolvers": "^3.3.4",
     "axios": "^1.6.7",
     "date-fns": "^3.3.1",
     "expo": "~50.0.0",
@@ -41,6 +41,7 @@
   "devDependencies": {
     "@babel/core": "^7.23.9",
     "@types/react": "~18.2.55",
+    "babel-plugin-module-resolver": "^5.0.3",
     "typescript": "^5.3.3"
   },
   "private": true
