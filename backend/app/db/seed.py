@@ -553,53 +553,44 @@ SAMPLE_PROPERTIES = [
 
 
 async def seed_database():
-    """Create initial data in the database."""
+    """Create initial data in the database. Uses bulk checks to minimize queries."""
     async with async_session_factory() as db:
-        # Seed subscription plans
+        # Check existing plans in one query
+        existing_plans = (await db.execute(select(SubscriptionPlan.name))).scalars().all()
         for plan_data in SUBSCRIPTION_PLANS:
-            existing = await db.execute(
-                select(SubscriptionPlan).where(SubscriptionPlan.name == plan_data["name"])
-            )
-            if not existing.scalar_one_or_none():
-                plan = SubscriptionPlan(**plan_data)
-                db.add(plan)
+            if plan_data["name"] not in existing_plans:
+                db.add(SubscriptionPlan(**plan_data))
         await db.flush()
 
         # Get free plan for admin
-        free_plan_result = await db.execute(
+        free_plan = (await db.execute(
             select(SubscriptionPlan).where(SubscriptionPlan.name == "Free")
-        )
-        free_plan = free_plan_result.scalar_one_or_none()
+        )).scalar_one_or_none()
 
-        # Seed admin user
-        existing_admin = await db.execute(
-            select(User).where(User.email == settings.ADMIN_EMAIL)
-        )
-        if not existing_admin.scalar_one_or_none():
-            admin = User(
+        # Seed admin user if missing
+        admin_exists = (await db.execute(
+            select(User.id).where(User.email == settings.ADMIN_EMAIL)
+        )).scalar_one_or_none()
+        if not admin_exists:
+            db.add(User(
                 email=settings.ADMIN_EMAIL,
                 password_hash=hash_password(settings.ADMIN_PASSWORD),
                 full_name="Platform Admin",
                 role=UserRole.superadmin,
                 subscription_plan_id=free_plan.id if free_plan else None,
-            )
-            db.add(admin)
+            ))
 
-        # Seed sources
+        # Check existing sources in one query
+        existing_sources = (await db.execute(select(Source.name))).scalars().all()
         for source_data in SOURCES:
-            existing = await db.execute(
-                select(Source).where(Source.name == source_data["name"])
-            )
-            if not existing.scalar_one_or_none():
-                source = Source(**source_data)
-                db.add(source)
+            if source_data["name"] not in existing_sources:
+                db.add(Source(**source_data))
 
-        # Seed sample properties
-        existing_count = await db.execute(select(AuctionProperty.id).limit(1))
-        if not existing_count.scalar_one_or_none():
+        # Seed sample properties only if table is empty
+        has_properties = (await db.execute(select(AuctionProperty.id).limit(1))).scalar_one_or_none()
+        if not has_properties:
             for prop_data in SAMPLE_PROPERTIES:
-                prop = AuctionProperty(status=AuctionStatus.active, **prop_data)
-                db.add(prop)
+                db.add(AuctionProperty(status=AuctionStatus.active, **prop_data))
 
         await db.commit()
         print(f"Seeded: {len(SUBSCRIPTION_PLANS)} plans, {len(SOURCES)} sources, "

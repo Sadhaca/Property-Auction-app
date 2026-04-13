@@ -25,17 +25,13 @@ async def lifespan(app: FastAPI):
     logger.info("application_startup", environment=settings.ENVIRONMENT)
 
     # Auto-create tables and seed data in development
-    try:
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
-        logger.info("database_tables_created")
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    logger.info("database_tables_created")
 
-        # Run seed data
-        from app.db.seed import seed_database
-        await seed_database()
-        logger.info("database_seeded")
-    except Exception as e:
-        logger.error("startup_db_error", error=str(e))
+    from app.db.seed import seed_database
+    await seed_database()
+    logger.info("database_seeded")
 
     app.state.db_session_factory = async_session_factory
     yield

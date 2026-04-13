@@ -7,11 +7,19 @@ from app.ingestion.manager import IngestionManager
 logger = structlog.get_logger()
 
 
-def run_async(coro):
-    """Helper to run async code inside Celery sync tasks."""
+def _run_ingestion(method: str, source_id: str | None = None):
+    """Run an IngestionManager method in a fresh event loop."""
+    async def _execute():
+        async with async_session_factory() as db:
+            manager = IngestionManager(db)
+            fn = getattr(manager, method)
+            result = await (fn(source_id) if source_id else fn())
+            logger.info("ingestion_complete", method=method, source_id=source_id)
+            return result
+
     loop = asyncio.new_event_loop()
     try:
-        return loop.run_until_complete(coro)
+        return loop.run_until_complete(_execute())
     finally:
         loop.close()
 
@@ -19,24 +27,10 @@ def run_async(coro):
 @celery_app.task(name="app.workers.tasks.run_source_ingestion")
 def run_source_ingestion(source_id: str):
     """Run ingestion for a single source."""
-    async def _run():
-        async with async_session_factory() as db:
-            manager = IngestionManager(db)
-            result = await manager.run_source(source_id)
-            logger.info("ingestion_complete", source_id=source_id, result=result)
-            return result
-
-    return run_async(_run())
+    return _run_ingestion("run_source", source_id)
 
 
 @celery_app.task(name="app.workers.tasks.run_all_ingestion")
 def run_all_ingestion():
     """Run ingestion for all active sources."""
-    async def _run():
-        async with async_session_factory() as db:
-            manager = IngestionManager(db)
-            results = await manager.run_all_sources()
-            logger.info("all_ingestion_complete", results=results)
-            return results
-
-    return run_async(_run())
+    return _run_ingestion("run_all_sources")
